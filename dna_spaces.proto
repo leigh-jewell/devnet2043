@@ -1,0 +1,380 @@
+syntax = "proto3";
+
+package firehose_api_v1;
+
+enum EventType {
+    DEVICE_ENTRY = 0;
+    DEVICE_EXIT = 1;
+    PROFILE_UPDATE = 3;
+    LOCATION_CHANGE = 4;
+    KEEP_ALIVE = 5;
+    APP_ACTIVATION = 6;
+    ACCOUNT_ADMIN_ACTIVATION = 7;
+    DEVICE_LOCATION_UPDATE = 8;
+    TP_PEOPLE_COUNT_UPDATE = 9;
+    APP_DE_ACTIVATION = 10;
+    DEVICE_PRESENCE = 15;
+    USER_PRESENCE = 16;
+}
+
+message EventRecord {
+    string record_uid = 1;
+    int64 record_timestamp = 2;
+    string spaces_tenant_id = 3;
+    string spaces_tenant_name = 4;
+    string partner_tenant_id = 5;
+    EventType event_type = 6;
+
+    oneof event {
+        DeviceEntry device_entry = 7;
+        DeviceExit device_exit = 8;
+        Device device_profile_update = 10;
+        LocationChange location_hierarchy_change = 11;
+        DeviceLocation device_location_update = 12;
+        AppActivation app_activation = 13;
+        AccountAdminChange account_admin_change = 14;
+        TPPeopleCountUpdate tp_people_count_update = 15;
+        DevicePresence device_presence = 20;
+        UserPresence user_presence = 21;
+    }
+}
+
+enum DevicePresenceEventType {
+    DEVICE_ENTRY_EVENT = 0;
+    DEVICE_IN_ACTIVE_EVENT = 1;
+    DEVICE_ACTIVE_EVENT = 2;
+    DEVICE_EXIT_EVENT = 3;
+    DEVICE_SSID_CHANGE_EVENT = 4;
+    DEVICE_RAW_USER_ID_CHANGE_EVENT = 5;
+}
+
+enum UserPresenceEventType {
+    USER_ENTRY_EVENT = 0;
+    USER_IN_ACTIVE_EVENT = 1;
+    USER_ACTIVE_EVENT = 2;
+    USER_EXIT_EVENT = 3;
+}
+
+message DevicePresence {
+     DevicePresenceEventType presence_event_type = 1;
+     bool was_in_active = 2;
+     Device device = 3;
+     Location location = 4;
+     string ssid = 5;
+     string raw_user_id = 6;
+     string visit_id = 7;
+     int32 days_since_last_visit = 8;
+     int64 entry_timestamp = 9;
+     string entry_date_time = 10;
+     int64 exit_timestamp = 11;
+     string exit_date_time = 12;
+     int32 visit_duration_minutes = 13;
+     string time_zone = 14;
+     string device_classification = 15;
+     string visit_classification = 16;
+     int32 active_devices_count = 17;
+     int32 in_active_devices_count = 18;
+}
+
+message UserPresence {
+
+    UserPresenceEventType presence_event_type = 1;
+    bool was_in_active = 2;
+    User user = 3;
+    Location location = 4;
+    string raw_user_id = 5;
+    string visit_id = 6;
+    int64 entry_timestamp = 7;
+    string entry_date_time = 8;
+    int64 exit_timestamp = 9;
+    string exit_date_time = 10;
+    int32 visit_duration_minutes = 11;
+    string time_zone = 12;
+    UserCount active_users_count = 13;
+    UserCount in_active_users_count = 14;
+
+    message UserCount {
+        int32 users_with_user_id = 1;
+        int32 users_without_user_id = 2;
+        int32 total_users = 3;
+    }
+}
+
+
+
+message User {
+    string user_id = 1;
+    repeated string device_ids = 2;
+    repeated string tags = 3;
+    string mobile = 4;
+    string email = 5;
+    Gender gender = 6;
+    string first_name = 7;
+    string last_name = 8;
+    string postal_code = 9;
+    repeated OtherField other_fields = 10;
+    repeated SocialNetworkInfo social_network_info = 11;
+}
+
+message Location {
+    string location_id = 1;
+    string name = 2;
+    repeated string inferred_location_types = 3;
+    Location parent = 4;
+}
+
+enum Gender {
+    OTHER = 0;
+    MALE = 1;
+    FEMALE = 2;
+}
+
+message OtherField {
+    string name = 1;
+    repeated string values = 2;
+}
+
+message SocialNetworkInfo {
+    SocialNetwork social_network = 1;
+    string social_handle = 2;
+    oneof social_info {
+        Facebook facebook = 3;
+        Twitter twitter = 4;
+        LinkedIn linked_in = 5;
+    }
+}
+
+enum SocialNetwork {
+    FACEBOOK = 0;
+    TWITTER = 1;
+    LINKEDIN = 2;
+}
+
+message Facebook {
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string middle_name = 4;
+    string name = 5;
+    string short_name = 6;
+    string name_format = 7;
+    string picture = 8;
+    string email = 9;
+    repeated OtherField other_fields = 101;
+}
+
+message Twitter {
+    string id = 1;
+    string name = 2;
+    string screen_name = 3;
+    int32 friends_count = 4;
+    int32 followers_count = 5;
+    string profile_image_url = 6;
+    string profile_banner_url = 7;
+    string location = 8;
+    int32 statuses_count = 9;
+    string email = 10;
+    bool profile_verified = 11;
+    string utc_offset = 12;
+    string time_zone = 13;
+    bool geo_enabled = 14;
+    string lang = 15;
+    repeated OtherField other_fields = 101;
+}
+
+message LinkedIn {
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string profile_picture = 4;
+    string email = 5;
+    repeated OtherField other_fields = 101;
+}
+
+message Device {
+    string device_id = 1;
+    string user_id = 2;
+    repeated string tags = 3;
+    string mobile = 4;
+    string email = 5;
+    Gender gender = 6;
+    string first_name = 7;
+    string last_name = 8;
+    string postal_code = 9;
+    repeated OptIn opt_ins = 10;
+    repeated OtherField other_fields = 11;
+    string mac_address = 12;
+    string manufacturer = 13;
+    string os = 14;
+    string os_version = 15;
+    DeviceType type = 16;
+    repeated SocialNetworkInfo social_network_info = 17;
+
+    enum OptIn {
+        MOBILE_NUMBER = 0;
+        EMAIL = 1;
+        TERMS_AND_CONDITIONS = 2;
+    }
+
+    enum DeviceType {
+        NOT_AVAILABLE = 0;
+        MOBILE = 1;
+        TABLET = 2;
+        LAPTOP = 3;
+        OTHER_DEVICE = 4;
+    }
+
+}
+
+
+message DeviceEntry {
+    Device device = 1;
+    Location location = 2;
+    string visit_id = 3;
+    int64 entry_timestamp = 4;
+    string entry_date_time = 5;
+    string time_zone = 6;
+    string device_classification = 7;
+    int32 days_since_last_visit = 8;
+}
+
+
+message DeviceExit {
+    Device device = 1;
+    Location location = 2;
+    string visit_id = 3;
+    int32 visit_duration_minutes = 4;
+    int64 entry_timestamp = 5;
+    string entry_date_time = 6;
+    int64 exit_timestamp = 7;
+    string exit_date_time = 8;
+    string time_zone = 9;
+    string device_classification = 10;
+    string visit_classification = 11;
+}
+
+message DeviceLocation {
+    Device device = 1;
+    Location location = 2;
+    string ssid = 3;
+    string raw_user_id = 4;
+    string visit_id = 5;
+    int64 last_seen = 6;
+    string device_classification = 7;
+    string map_id = 8;
+    float x_pos = 9;
+    float y_pos = 10;
+    double confidence_factor = 11;
+    double latitude = 12;
+    double longitude = 13;
+}
+
+enum ChangeType {
+    ADD = 0;
+    REMOVE = 1;
+    MOVE = 2;
+    UPDATE = 3;
+}
+
+message MapDetails {
+    string map_id = 1;
+    int32 image_width = 2;
+    int32 image_height = 3;
+    string mime_type = 4;
+}
+
+message LocationDetails {
+    string time_zone = 3;
+    string city = 4;
+    string state = 5;
+    string country = 6;
+    string category = 7;
+    repeated Metadata metadata = 8;
+    double latitude = 9;
+    double longitude = 10;
+    MapDetails map_details = 11;
+
+    message Metadata {
+        string key = 1;
+        repeated string values = 2;
+    }
+}
+
+message LocationChange {
+    ChangeType change_type = 1;
+    Location location = 2;
+    LocationDetails location_details = 3;
+}
+
+
+message AppActivation {
+    string spaces_tenant_name = 1;
+    string spaces_tenant_id = 2;
+    string partner_tenant_id = 3;
+    string name = 4;
+    string reference_id = 5;
+    string instance_name = 6;
+}
+
+message AccountAdminChange {
+    ChangeType change_type = 1;
+    string login_email = 2;
+}
+
+message TPPeopleCountUpdate {
+    string tp_device_id = 1;
+    Location location = 2;
+    bool presence = 3;
+    int64 people_count = 4;
+    int32 standby_state = 6;
+    int32 ambient_noise = 7;
+    int32 dryness_score = 8;
+    int32 active_calls = 9;
+    int32 presentation_state = 10;
+    int64 time_stamp = 11;
+}
+
+message EventsStreamRequest {
+    int32 min_partition = 1;
+    int32 max_partition = 2;
+    int64 from_timestamp = 3;
+    int32 replica_id = 4;
+}
+
+message LocationInfoRequest {
+    string location_id = 1;
+    string partner_tenant_id = 2;
+}
+
+message LocationInfo {
+    Location location = 2;
+    LocationDetails location_details = 3;
+}
+
+message FloorImageRequest {
+    string image_name = 1;
+}
+
+message FloorImage {
+    string name = 1;
+    bytes data = 2;
+    string mime_type = 3;
+}
+
+
+service Firehose {
+
+    rpc GetEvents (EventsStreamRequest) returns (stream EventRecord) {
+
+    }
+
+    rpc GetLocationInfo(LocationInfoRequest)  returns (LocationInfo) {
+
+    }
+
+    rpc GetFloorImage(FloorImageRequest)  returns (FloorImage) {
+
+    }
+
+
+}

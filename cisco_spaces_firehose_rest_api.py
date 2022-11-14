@@ -3,9 +3,9 @@ import requests
 from os import environ
 
 if 'TOKEN' in environ:
-    token = environ['TOKEN']
-    print(f"Got token {token}")
-    headers = {'X-API-Key': token}
+    api_key = environ['TOKEN']
+    print(f"Got API key {api_key}")
+    headers = {'X-API-Key': api_key}
     r = requests.get('https://partners.dnaspaces.io/api/partners/v1/firehose/events', stream=True, headers=headers)
     if r.status_code == 200:
         print(f"Got status code {r.status_code}")
