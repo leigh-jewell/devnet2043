@@ -24,10 +24,20 @@ class FirehoseStub(object):
                 request_serializer=dna__spaces__pb2.LocationInfoRequest.SerializeToString,
                 response_deserializer=dna__spaces__pb2.LocationInfo.FromString,
                 )
-        self.GetFloorImage = channel.unary_unary(
-                '/firehose_api_v1.Firehose/GetFloorImage',
-                request_serializer=dna__spaces__pb2.FloorImageRequest.SerializeToString,
-                response_deserializer=dna__spaces__pb2.FloorImage.FromString,
+        self.GetFloorMap = channel.unary_unary(
+                '/firehose_api_v1.Firehose/GetFloorMap',
+                request_serializer=dna__spaces__pb2.FloorMapRequest.SerializeToString,
+                response_deserializer=dna__spaces__pb2.FloorMap.FromString,
+                )
+        self.SaveDevice = channel.unary_unary(
+                '/firehose_api_v1.Firehose/SaveDevice',
+                request_serializer=dna__spaces__pb2.SaveDeviceRequest.SerializeToString,
+                response_deserializer=dna__spaces__pb2.Device.FromString,
+                )
+        self.GetDevice = channel.unary_unary(
+                '/firehose_api_v1.Firehose/GetDevice',
+                request_serializer=dna__spaces__pb2.GetDeviceRequest.SerializeToString,
+                response_deserializer=dna__spaces__pb2.Device.FromString,
                 )
 
 
@@ -46,7 +56,19 @@ class FirehoseServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetFloorImage(self, request, context):
+    def GetFloorMap(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SaveDevice(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetDevice(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -65,10 +87,20 @@ def add_FirehoseServicer_to_server(servicer, server):
                     request_deserializer=dna__spaces__pb2.LocationInfoRequest.FromString,
                     response_serializer=dna__spaces__pb2.LocationInfo.SerializeToString,
             ),
-            'GetFloorImage': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetFloorImage,
-                    request_deserializer=dna__spaces__pb2.FloorImageRequest.FromString,
-                    response_serializer=dna__spaces__pb2.FloorImage.SerializeToString,
+            'GetFloorMap': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetFloorMap,
+                    request_deserializer=dna__spaces__pb2.FloorMapRequest.FromString,
+                    response_serializer=dna__spaces__pb2.FloorMap.SerializeToString,
+            ),
+            'SaveDevice': grpc.unary_unary_rpc_method_handler(
+                    servicer.SaveDevice,
+                    request_deserializer=dna__spaces__pb2.SaveDeviceRequest.FromString,
+                    response_serializer=dna__spaces__pb2.Device.SerializeToString,
+            ),
+            'GetDevice': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetDevice,
+                    request_deserializer=dna__spaces__pb2.GetDeviceRequest.FromString,
+                    response_serializer=dna__spaces__pb2.Device.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -115,7 +147,7 @@ class Firehose(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetFloorImage(request,
+    def GetFloorMap(request,
             target,
             options=(),
             channel_credentials=None,
@@ -125,8 +157,42 @@ class Firehose(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/firehose_api_v1.Firehose/GetFloorImage',
-            dna__spaces__pb2.FloorImageRequest.SerializeToString,
-            dna__spaces__pb2.FloorImage.FromString,
+        return grpc.experimental.unary_unary(request, target, '/firehose_api_v1.Firehose/GetFloorMap',
+            dna__spaces__pb2.FloorMapRequest.SerializeToString,
+            dna__spaces__pb2.FloorMap.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SaveDevice(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/firehose_api_v1.Firehose/SaveDevice',
+            dna__spaces__pb2.SaveDeviceRequest.SerializeToString,
+            dna__spaces__pb2.Device.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetDevice(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/firehose_api_v1.Firehose/GetDevice',
+            dna__spaces__pb2.GetDeviceRequest.SerializeToString,
+            dna__spaces__pb2.Device.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

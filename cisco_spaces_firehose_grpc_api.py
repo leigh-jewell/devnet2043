@@ -1,37 +1,52 @@
 # Refer to https://partners.dnaspaces.io/partner/ for creation of 3rd party apps for Cisco DNA Spaces
 # This gist shows how to get the firehose events with grpc in Python
-# You will need to get the CA cert via openssl - echo | openssl s_client -servername partners.dnaspaces.io -connect \
-# partners.dnaspaces.io:443|sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > CA.pem
+# You will need to get the CA cert via openssl - echo | openssl s_client -servername partners.dnaspaces.io -connect partners.dnaspaces.io:443|sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > CA.pem
+# gRPC information reference https://grpc.io/docs/languages/python/quickstart/
+# gRPC proto file can be found here: http://partners.dnaspaces.io/resources/dnaspaces_grpc_proto_spec_v1.2.6_standard.proto
+#
+# TO recompile with proto file:
+# python -m grpc_tools.protoc -I./ --python_out=. --pyi_out=. --grpc_python_out=. ./dnaspaces.proto
+#
 import grpc
 import dna_spaces_pb2
 import dna_spaces_pb2_grpc
 from prettytable import PrettyTable
 from os import environ
+from datetime import timedelta
+from datetime import datetime
 
-
-api_key = "some-key-here"
 
 def run():
     if 'TOKEN' in environ:
+        prev_hour = round((datetime.now() - timedelta(hours=1)).timestamp()*1000)
         token = environ['TOKEN']
         print(f"Got token {token}")
-        metadata = [('x-api-key', api_key)]
+        metadata = [('x-api-key', token)]
         with open('CA.pem', 'rb') as f:
             credentials = grpc.ssl_channel_credentials(f.read())
         with grpc.secure_channel('partners.dnaspaces.io:443', credentials) as channel:
             stub = dna_spaces_pb2_grpc.FirehoseStub(channel)
-            events = stub.GetEvents(dna_spaces_pb2.EventsStreamRequest(), metadata=metadata)
+            events = stub.GetEvents(dna_spaces_pb2.EventsStreamRequest(from_timestamp=prev_hour), metadata=metadata)
             i = 0
-            t = PrettyTable(['spaces_tenant_name', 'mac_address', 'x_pos', 'y_pos', 'confidence_factor'])
+            t = PrettyTable(['mac_address', 'x_pos', 'y_pos'])
             for event in events:
-                i += 1
-                if event.event_type != dna_spaces_pb2.EventType.KEEP_ALIVE:
-                    t.add_row([event.spaces_tenant_name,
-                               event.device_location_update.device.mac_address,
-                               f'{event.device_location_update.x_pos:.2f}',
-                               f'{event.device_location_update.y_pos:.2f}',
-                               event.device_location_update.confidence_factor])
-                if i > 10:
+                if event.event_type == dna_spaces_pb2.EventType.IOT_TELEMETRY:
+                    # Only interested in the IOT events
+                    i += 1
+                    # Keep count of events we receive
+                    print(event)
+                    # Print out the IOT_TELEMETRY
+                    mac = event.iot_telemetry.device_info.device_mac_address
+                    try:
+                        x_pos = event.iot_telemetry.detected_position.x_pos
+                        y_pos = event.iot_telemetry.detected_position.y_pos
+                        t.add_row([mac, round(x_pos), round(y_pos)])
+                    except ValueError:
+                        print(f"No position for {mac}")
+                elif event.event_type == dna_spaces_pb2.EventType.KEEP_ALIVE:
+                    print(".", sep="")
+                if i > 20:
+                    # Once we have seen 20 IOT_TELEMETRY events we will break out of the for loop
                     break
             print(t)
 
