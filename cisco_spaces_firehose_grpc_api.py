@@ -44,8 +44,8 @@ def run():
                     except ValueError:
                         print(f"No position for {mac}")
                 elif event.event_type == dna_spaces_pb2.EventType.KEEP_ALIVE:
-                    print(".", sep="")
-                if i > 20:
+                    print(".", end='')
+                if i > 100:
                     # Once we have seen 20 IOT_TELEMETRY events we will break out of the for loop
                     break
             print(t)
