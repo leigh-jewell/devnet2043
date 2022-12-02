@@ -44,7 +44,7 @@ def activate(decoded_data, bearer):
                 if "data" in returned_keys:
                     if "apiKey" in returned_data['data']:
                         api_key = returned_data['data']['apiKey']
-                        print(f"Got API key {api_key}")
+                        print(f"Got API key.")
                         return api_key
                     else:
                         print("Error: no apiKey provided in data.")
@@ -69,4 +69,4 @@ if __name__ == '__main__':
     if len(activation_key) > 0:
         decoded = get_payload(activation_key)
         api_key = activate(decoded, activation_key)
-        print(f"API Token for activation:{api_key}")
+        print(f"API Token for activation: {api_key}")

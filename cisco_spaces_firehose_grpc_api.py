@@ -18,9 +18,12 @@ from datetime import datetime
 
 def run():
     if 'TOKEN' in environ:
-        prev_hour = round((datetime.now() - timedelta(hours=1)).timestamp()*1000)
         token = environ['TOKEN']
-        print(f"Got token {token}")
+    else:
+        token = input("Please enter TOKEN key: ")
+    if len(token) > 0:
+        prev_hour = round((datetime.now() - timedelta(hours=1)).timestamp()*1000)
+
         metadata = [('x-api-key', token)]
         with open('CA.pem', 'rb') as f:
             credentials = grpc.ssl_channel_credentials(f.read())
@@ -49,8 +52,9 @@ def run():
                     # Once we have seen 20 IOT_TELEMETRY events we will break out of the for loop
                     break
             print(t)
+    else:
+        print("Error: API key too short.")
 
 
 if __name__ == '__main__':
-    print("Start.")
     run()
